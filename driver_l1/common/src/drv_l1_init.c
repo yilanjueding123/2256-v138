@@ -108,7 +108,13 @@ void drv_l1_init(void)
 
   #if _DRV_L1_UART==1
     uart0_init();	
-    uart0_buad_rate_set(UART0_BAUD_RATE);
+    
+#ifdef UART_TXRX_DATA
+		uart0_buad_rate_set(UART0_BAUD_TXRX_RATE);
+#else
+		uart0_buad_rate_set(UART0_BAUD_RATE);
+#endif
+    
     
    #if (defined DBG_MESSAGE) && (DBG_MESSAGE==CUSTOM_ON)
 	uart0_tx_enable();

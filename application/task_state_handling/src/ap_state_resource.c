@@ -10,6 +10,11 @@ INT32U ap_state_resource_string_load(INT16U language, INT16U index);
 INT32S ap_state_resource_number_font_cache_init(void);
 INT32S ap_state_resource_char_resolution_get(INT16U target_char, STRING_INFO *str_info, t_STRING_TABLE_STRUCT *str_res);
 INT32S ap_state_resource_char_draw(INT16U target_char, INT16U *frame_buff, STRING_INFO *str_info);
+INT16S ap_state_resource_time_stamp_position_x_get(void);
+void ap_state_resource_time_stamp_position_y_set(INT16S y);
+
+void ap_state_resource_time_stamp_position_x_set(INT16S x);
+INT16S time_stamp_position_x, time_stamp_position_y;
 
 INT32S ap_state_resource_init(void)
 {
@@ -46,6 +51,10 @@ INT32S ap_state_resource_init(void)
 		}
 		number_font_cache = 0;
 	}
+
+	
+	ap_state_resource_time_stamp_position_x_set(65);
+	ap_state_resource_time_stamp_position_y_set(434);
 	return STATUS_OK;
 }
 
@@ -62,6 +71,25 @@ void ap_state_resource_exit(void)
 		gp_free((void *) resource_header);
 		resource_header = NULL;
 	}
+}
+
+void ap_state_resource_time_stamp_position_x_set(INT16S x)
+{
+	time_stamp_position_x = x; 
+}
+
+INT16S ap_state_resource_time_stamp_position_x_get(void)
+{
+	return time_stamp_position_x;
+}
+void ap_state_resource_time_stamp_position_y_set(INT16S y)
+{
+	time_stamp_position_y = y; 
+}
+
+INT16S ap_state_resource_time_stamp_position_y_get(void)
+{
+	return time_stamp_position_y;
 }
 
 INT32U ap_state_resource_string_load(INT16U language, INT16U index)
@@ -353,3 +381,90 @@ INT32S resource_read(INT32U offset_byte, INT8U *pbuf, INT32U byte_count)
 	}
 	return STATUS_OK;
 }
+
+INT32S ap_state_resource_char_draw_osd(INT16U target_char, INT16U *frame_buff, STRING_INFO *str_info, INT8U type, INT8U num_type)
+{
+	INT32U  offset_pixel, font_data, offset_tmp, byte_tmp, len, j, width, height,k;
+	INT32S i, buf_h_idx;
+	const INT8U *input_buffer;
+	//t_FONT_STRUCT font_header;
+	t_FONT_TABLE_STRUCT font;	
+	
+	
+	font.font_height = 40;
+	font.font_width = 19;
+	font.bytes_per_line = 3;
+	byte_tmp = font.bytes_per_line;
+	
+	if(target_char==0x2F)
+	{
+		input_buffer = acFontHZArial017Slash+str_info->font_offset_h*byte_tmp;
+	}
+	else if(target_char==0x3A)
+	{
+		input_buffer = acFontHZArial017Comma+str_info->font_offset_h*byte_tmp;
+	}
+	else
+	{
+		target_char -= 0x0030;
+		input_buffer = number[target_char]+str_info->font_offset_h*byte_tmp;
+	}
+	
+	width = str_info->buff_w;
+	height = str_info->buff_h;
+
+	//draw
+//	font_data = 0;
+	for (i=str_info->font_offset_h,buf_h_idx = 0; i<font.font_height; i++,buf_h_idx++) {
+
+		if((str_info->pos_y + buf_h_idx) >= str_info->buff_h) {
+			break;
+		}
+
+		if (type == YUV420_DRAW) {
+			if ((str_info->pos_y + buf_h_idx) & 0x1) {
+				offset_tmp = ((str_info->pos_y + buf_h_idx-1)*width*3>>1) + (width<<1) + str_info->pos_x;
+			} else {
+				offset_tmp = ((str_info->pos_y + buf_h_idx)*width*3>>1) + str_info->pos_x;
+			}
+		} else if(type == YUYV_DRAW) {
+			offset_tmp = (str_info->pos_y + buf_h_idx)*width + (str_info->pos_x & ~0x0001);
+		} else {
+			offset_tmp = (str_info->pos_y + buf_h_idx)*width + str_info->pos_x;
+		}
+		
+		for(k=0;k<font.bytes_per_line;k++)
+		{
+			//if(k<2)
+			{
+				len = 8;
+			}
+			//else
+			//{
+			///	len = 3;
+			//}
+			offset_tmp = offset_tmp+8;
+			font_data = *input_buffer++;
+			for (j=0 ; j<len ; j++) {
+				//loop unrolling
+				//if (font_data & (1 << (7 - (j&7)))) {
+				if (font_data & 0x80) {
+					offset_pixel = offset_tmp + j;
+					if (type == YUV420_DRAW) {
+						*((INT8U *)frame_buff + offset_pixel) = 0xFF;
+					} else {
+						*(frame_buff + offset_pixel) = str_info->font_color;
+					}
+				}
+				else
+				{
+					offset_pixel = offset_tmp + j;
+				}
+				font_data=font_data<<1;
+			}
+		}
+	}
+	str_info->pos_x += font.font_width;
+	return STATUS_OK;
+}	
+

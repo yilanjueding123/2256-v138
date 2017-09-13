@@ -117,6 +117,283 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 //=======================================================================
 //  Draw OSD function
 //=======================================================================
+#ifdef	GPVC_1247_OSD
+
+extern INT32S ap_state_resource_char_draw_osd(INT16U target_char, INT16U *frame_buff, STRING_INFO *str_info, INT8U type, INT8U num_type);
+extern INT16S ap_state_resource_time_stamp_position_x_get(void);
+extern INT16S ap_state_resource_time_stamp_position_y_get(void);
+extern INT8U FIFO_LINE_LN ;
+extern INT8U display_osd_flag;
+
+void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT8U draw_type, INT8U state)
+{
+#if 1
+	 INT32S tm1;
+	 INT16S gap_1, gap_2;
+	 STRING_INFO str_info = {0};
+	 INT8U enable_draw_time_flag = 0;
+	 INT8U year_mon_day_format = 0;
+ 
+#if 0 // 穦耑FIFO
+	 if(current_time.tm_year > 2099) {
+		 current_time.tm_year = 2000;
+		 cal_time_set(current_time);
+	 }
+#endif
+	 str_info.language = LCD_EN;
+ 
+	 if(((state & 0xF) == (STATE_VIDEO_RECORD & 0xF)) || ((state & 0xF) == (STATE_VIDEO_PREVIEW & 0xF))) {
+		 gap_1 = 3;
+		 gap_2 = 20;
+		 str_info.font_color = 0xFF80;	 //white	 //0x5050;	 //green
+		 str_info.pos_x = ap_state_resource_time_stamp_position_x_get();//时间标签的x坐标,默认是从0开始
+ 
+		 // Video Recording
+		 if((state & 0xF) == (STATE_VIDEO_RECORD & 0xF))
+		 {
+			 if(FIFO_LINE_LN == 16)
+			 {
+				 // 字高40,使用3個fifo(16 line)來加上時間 
+				 if(state & 0x80)
+				 {	 // The last part of date stamp
+					 str_info.pos_y = 0;
+					 str_info.font_offset_h = 28;
+				 }
+				 else if(state & 0x40)
+				 {	 // The 2nd part of date stamp 
+					 str_info.pos_y = 0;
+					 str_info.font_offset_h = 12;
+				 }
+				 else
+				 {	 // The first part of date stamp
+					 str_info.pos_y = 4;
+					 str_info.font_offset_h = 0;
+				 }
+			 }
+			 else
+			 {
+				 // 字高40,使用2個fifo(32 line)來加上時間 
+				 if(state & 0x40)
+				 {	 // The 2nd part of date stamp 
+					 str_info.pos_y = 0;
+					 str_info.font_offset_h = 20;
+				 }
+				 else
+				 {	 // The first part of date stamp
+					 str_info.pos_y = 12;
+					 str_info.font_offset_h = 0;
+				 }
+			 }
+		 } 
+		 else
+		 {	 // Capture Photo
+			 if(my_pAviEncVidPara->sensor_height == AVI_HEIGHT_720P)
+			 {
+				 str_info.pos_y = 651;
+			 }
+			 else if (my_pAviEncVidPara->sensor_height == AVI_HEIGHT_WVGA)
+			 {
+				 str_info.pos_y = 434;
+			 }
+			 else // AVI_HEIGHT_QVGA
+			 {
+				 str_info.pos_y = 217;
+			 }
+		 }
+ 
+		 str_info.buff_w = my_pAviEncVidPara->sensor_width;
+ 
+		 if((state & 0xF) == (STATE_VIDEO_RECORD & 0xF))	 
+		 {
+			 str_info.buff_h = FIFO_LINE_LN; // Fifo line length
+		 }
+		 else
+		 {
+			 str_info.buff_h = my_pAviEncVidPara->sensor_height;
+		 }
+		 
+	 } else {
+		 gap_1 = 2;
+		 gap_2 = 8;
+		 str_info.font_color = 0xFFFF;	 //white
+		 str_info.pos_x = ap_state_resource_time_stamp_position_x_get()/2;
+		 str_info.pos_y = ap_state_resource_time_stamp_position_y_get()/2;
+		 str_info.buff_w = TFT_WIDTH;
+		 str_info.buff_h = TFT_HEIGHT;
+	 }
+ 
+ 
+	 enable_draw_time_flag = draw_type & 0xF0;
+	 draw_type &= 0x0F;
+ 
+	 year_mon_day_format = ap_state_config_data_time_mode_get();
+	 if(display_osd_flag){
+	 switch(year_mon_day_format)
+	 {
+		 case 0:  // Y/M/D
+		 default:
+			 tm1 = current_time.tm_year/1000;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*1000;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/100;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*100;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_mon/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mon -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_mday/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mday -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_2;		 
+		 break;
+ 
+		 case 1:  // D/M/Y
+			 tm1 = current_time.tm_mday/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mday -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;		 
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_mon/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mon -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/1000;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*1000;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/100;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*100;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_2;
+		 break;
+ 
+		 case 2:  // M/D/Y
+			 tm1 = current_time.tm_mon/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mon -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_mday/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_mday -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_1;		 
+ 
+			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/1000;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*1000;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/100;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*100;
+			 str_info.pos_x += gap_1;
+ 
+			 tm1 = current_time.tm_year/10;
+			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 current_time.tm_year -= tm1*10;
+			 str_info.pos_x += gap_1;
+ 
+			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+			 str_info.pos_x += gap_2;
+		 break;
+	 }
+ 
+	 if(enable_draw_time_flag == DRAW_DATE_TIME)
+	 {
+		 tm1 = current_time.tm_hour/10;
+		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+		 current_time.tm_hour -= tm1*10;
+		 str_info.pos_x += gap_1;
+ 
+		 ap_state_resource_char_draw_osd(current_time.tm_hour+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+		 str_info.pos_x += gap_1;
+ 
+		 ap_state_resource_char_draw_osd(0x3A, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  ":"
+		 str_info.pos_x += gap_1;
+ 
+		 tm1 = current_time.tm_min/10;
+		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+		 current_time.tm_min -= tm1*10;
+		 str_info.pos_x += gap_1;
+ 
+		 ap_state_resource_char_draw_osd(current_time.tm_min+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+		 str_info.pos_x += gap_1;
+ 
+		 ap_state_resource_char_draw_osd(0x3A, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  ":"
+		 str_info.pos_x += gap_1;
+ 
+		 tm1 = current_time.tm_sec/10;
+		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+		 current_time.tm_sec -= tm1*10;
+		 str_info.pos_x += gap_1;
+ 
+		 ap_state_resource_char_draw_osd(current_time.tm_sec+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
+	 }
+		}
+ #endif
+ }
+
+#else 
 void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution)
 {
 	INT8U  data;
@@ -152,7 +429,7 @@ void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolut
   #endif
 
 	space = 16;
-//Arial 17
+	//Arial 17
 	// year
 	if (current_time.tm_year > 2008) {
 		wtemp = current_time.tm_year - 2000;
@@ -207,7 +484,7 @@ void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolut
 	cpu_draw_osd(number[wtemp/10], line,offset+space*17,resolution);
 	cpu_draw_osd(number[wtemp%10],line,offset+space*18,resolution);	
 }
-
+#endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // scaler task
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +733,7 @@ INT32S video_encode_task_create(INT8U pori)
 {
 	INT8U  err;
 	INT32S nRet;
-	
+
 	vid_enc_task_q = OSQCreate(video_encode_task_q_stack, C_JPEG_QUEUE_MAX);
 	if(!scaler_task_q) RETURN(STATUS_FAIL);
 	
@@ -475,7 +752,7 @@ INT32S video_encode_task_del(void)
 {
 	INT8U  err;
 	INT32S nRet, msg;
-	
+	__msg("video_encode_task_del\n");
 	nRet = STATUS_OK;
 	POST_MESSAGE(vid_enc_task_q, MSG_VIDEO_ENCODE_TASK_EXIT, vid_enc_task_ack_m, 5000, msg, err);
 Return:	
@@ -489,7 +766,7 @@ INT32S video_encode_task_start(void)
 {
 	INT8U  err;
 	INT32S nRet, msg;
-	
+
 	nRet = STATUS_OK;
 	POST_MESSAGE(vid_enc_task_q, MSG_VIDEO_ENCODE_TASK_MJPEG_INIT, vid_enc_task_ack_m, 5000, msg, err);
 Return:
@@ -500,7 +777,7 @@ INT32S video_encode_task_stop(void)
 {
 	INT8U  err;
 	INT32S nRet, msg;
-	
+
 	nRet = STATUS_OK;
 	POST_MESSAGE(vid_enc_task_q, MSG_VIDEO_ENCODE_TASK_STOP, vid_enc_task_ack_m, 5000, msg, err);
 Return:
@@ -544,6 +821,7 @@ void video_encode_task_entry(void *parm)
 		switch(msg_id & ~0xff)
 		{
 		case MSG_VIDEO_ENCODE_TASK_MJPEG_INIT:
+
 		 	encode_width = pAviEncVidPara->encode_width;
 		 	encode_height = pAviEncVidPara->encode_height;
 		 	csi_width = pAviEncVidPara->sensor_capture_width;
@@ -582,12 +860,14 @@ void video_encode_task_entry(void *parm)
 			break;
 			
 		case MSG_VIDEO_ENCODE_TASK_EXIT:
+
 			OSMboxPost(vid_enc_task_ack_m, (void*)C_ACK_SUCCESS);	
 			OSTaskDel(OS_PRIO_SELF);
 			break;
 
 
 		case AVIPACKER_MSG_VIDEO_WRITE_DONE:
+
 			pAviEncVidPara->video_encode_addr[msg_id & 0xff].is_used = 0;
 			JpegSendFlag = 0;
 
@@ -611,6 +891,7 @@ void video_encode_task_entry(void *parm)
 			break;
 
 		default:
+
 #if VIDEO_ENCODE_USE_MODE == SENSOR_BUF_FRAME_MODE
 //			pAviEncPara->vid_pend_cnt++;
 

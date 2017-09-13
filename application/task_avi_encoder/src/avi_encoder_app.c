@@ -1009,6 +1009,7 @@ void avi_encode_switch_csi_frame_buffer(void)
   #else
 	INT32U addr, addr1;
 	INT8U  err;
+	__msg("avi_encode_switch_csi_frame_buffer\n");
 
 	addr = (INT32U) OSQAccept(cmos_frame_q, &err);
 	if((addr == NULL) || (err != OS_NO_ERR)) {

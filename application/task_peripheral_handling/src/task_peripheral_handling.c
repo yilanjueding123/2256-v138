@@ -32,7 +32,7 @@ void task_peripheral_handling_entry(void * para)
 	INT8U			usbd_debounce_cnt;
 	INT8U usb_detect_start;
 	INT32U			bat_ck_timerid;
-
+	
 	//	INT8U  bat_check;
 	usb_detect_start	= 0;
 	bat_ck_timerid		= 0xFF;

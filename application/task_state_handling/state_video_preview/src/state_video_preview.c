@@ -71,7 +71,6 @@ void state_video_preview_entry(void *para)
 
         	case MSG_APQ_CAPTUER_ACTIVE:
 				
-				__msg("MSG_APQ_CAPTUER_ACTIVE\n");
 				pic_flag = 1;
 				ap_state_handling_auto_power_off_set(FALSE);
 				pic_down_flag=1;
@@ -104,7 +103,7 @@ void state_video_preview_entry(void *para)
         		#else
         		OSTimeDly(35);
 				#endif
-				__msg(">>>>MSG_STORAGE_SERVICE_PIC_DONE<<<<<\n");
+
 				pic_down_flag=0;
         		ap_state_handling_auto_power_off_set(TRUE);
         		if (pic_flag == 2) {

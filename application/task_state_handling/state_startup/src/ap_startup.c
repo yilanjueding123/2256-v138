@@ -29,9 +29,9 @@ extern INT8U csi_fifo_flag;
 void capture_switch(void)
 {
 	VIDEO_ARGUMENT arg;
-	
-	video_encode_preview_stop();
 
+	video_encode_preview_stop();
+	
 	OSTimeDly(10);
 	csi_fifo_flag = 1;
 

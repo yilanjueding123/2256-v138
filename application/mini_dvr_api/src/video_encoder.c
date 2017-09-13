@@ -30,7 +30,7 @@ void video_encode_exit(void)
 	
 	if(video_encode_status() == VIDEO_CODEC_PROCESSING)
    		video_encode_stop();
-   	
+
    	video_encode_preview_stop();
    	
     nRet = avi_encode_state_task_del();

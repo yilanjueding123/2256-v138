@@ -290,16 +290,16 @@ void sccb_write_16bit (
 	
 	
 	{
-	INT16U read_data;
-	read_data = sccb_read_16bit(id,addr);
-	if(read_data == data)
-	{
-		DBG_PRINT("addr = 0x%x,write_data 0x%x,read_data = 0x%x \r\n", addr,data,read_data);
-	}
-	else
-	{
-		DBG_PRINT("--------------addr = 0x%x,write_data 0x%x,read_data = 0x%x----------------\r\n", addr,data,read_data);
-	}
+		INT16U read_data;
+		read_data = sccb_read_16bit(id,addr);
+		if(read_data == data)
+		{
+			DBG_PRINT("addr = 0x%x,write_data 0x%x,read_data = 0x%x \r\n", addr,data,read_data);
+		}
+		else
+		{
+			DBG_PRINT("--------------addr = 0x%x,write_data 0x%x,read_data = 0x%x----------------\r\n", addr,data,read_data);
+		}
 	 
 	}
 }

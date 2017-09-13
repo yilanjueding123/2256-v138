@@ -308,6 +308,7 @@ void set_led_mode(LED_MODE_ENUM mode)
 		case LED_WAITING_CAPTURE:
 			led_red_off();
 			led_green_on();
+			msgQSend(ApQ, MSG_APQ_VIDEO_RECORD_ACTIVE, NULL, NULL, MSG_PRI_NORMAL);
 			DBG_PRINT("led_type = LED_WAITING_CAPTURE\r\n");
 			break;
 
@@ -1444,13 +1445,21 @@ void ap_peripheral_video_key_exe(INT16U * tick_cnt_ptr)
 		{
 			if (*tick_cnt_ptr >= Long_Single_width)
 			{
-				__msg("video\n");
 				msgQSend(ApQ, MSG_APQ_VIDEO_RECORD_ACTIVE, NULL, NULL, MSG_PRI_NORMAL);
 			}
 			else 
 			{
 				DBG_PRINT("caputure\n");
-				msgQSend(ApQ, MSG_APQ_CAPTUER_ACTIVE, NULL, NULL, MSG_PRI_NORMAL);
+				if(video_record_sts & 0x2)
+				{
+					__msg("stop video\n");
+					msgQSend(ApQ, MSG_APQ_VIDEO_RECORD_ACTIVE, NULL, NULL, MSG_PRI_NORMAL);
+				}
+				else
+				{		
+					__msg("begin capture and video\n");
+					msgQSend(ApQ, MSG_APQ_CAPTUER_ACTIVE, NULL, NULL, MSG_PRI_NORMAL);
+				}
 			}
 		}
 	}

@@ -38,8 +38,8 @@
 //#define	__OV6680_DRV_C__				1
 //#define	__OV7680_DRV_C__				1
 //#define	__OV7670_DRV_C__				1
-//#define	__BF3925_DRV_C__				1
-#define	__OV2686_DRV_C__				1
+#define	__BF3925_DRV_C__				1
+//#define	__OV2686_DRV_C__				1
 //#define   __OV2643_DRV_C__    			1
 //#define	__OV7725_DRV_C__				1
 //#define	__GC0308_DRV_C__				1
@@ -60,6 +60,9 @@
 #define AVI_HEIGHT						720//480
 #define AVI_Q_VALUE						50//30		// 40, 50, 60
 #define AVI_FRAME_RATE					30		// Frame per second
+
+//#define UART_TXRX_DATA
+#define UART0_BAUD_TXRX_RATE			115200
 
 /*
 #if VIDEO_ENCODE_USE_MODE == SENSOR_BUF_FRAME_MODE
@@ -140,11 +143,11 @@
 //++++++++++++++++++++++++++++
 #elif USE_IOKEY_NO == 1 && USE_ADKEY_NO == 1		
 
-#define VIDEO_KEY            	 	IO_H3 
+#define VIDEO_KEY            	 	IO_C10//IO_H3 
 #define CAPTURE_KEY            		IO_F15
 #define FUNCTION_KEY				ADKEY_LVL_1 //dummy
 
-#define VIDEO_ACTIVE_KEY			0
+#define VIDEO_ACTIVE_KEY			1
 #define CAPTURE_ACTIVE_KEY			0
 
 #else
@@ -162,6 +165,7 @@
 
 #define LED1							IO_F5//blue
 #define LED2							IO_F7//red
+//#define GPVC_1247_OSD
 
 #define CAPTURE_KEY_SAVE_VIDEO			1
 #define PRODUCT_NUM                     2256

@@ -67,3 +67,5 @@ extern INT32S ap_state_resource_string_draw(INT16U *frame_buff, STRING_INFO *str
 extern INT32S ap_state_resource_string_ascii_draw(INT16U *frame_buff, STRING_ASCII_INFO *str_ascii_info);
 extern INT16U ap_state_resource_language_num_get(void);
 extern INT32S ap_state_resource_user_option_load(SYSTEM_USER_OPTION *user_option);
+extern INT16S ap_state_resource_time_stamp_position_x_get(void);
+

@@ -488,8 +488,8 @@ void avi_encode_state_task_entry(void *para)
 					#endif
     			#endif
 
-video_encode_sensor_stop();
-OSTimeDly(10);
+				video_encode_sensor_stop();
+				OSTimeDly(10);
 				
 				write(pAviEncPara->AviPackerCur->file_handle, (INT32U) jpeg_picture_header, 624);
 #if VIDEO_ENCODE_USE_MODE == SENSOR_BUF_FRAME_MODE
@@ -544,6 +544,7 @@ OSTimeDly(10);
 					nRet = STATUS_OK;
 				}
 				if(nRet < 0) goto AVI_CAPTURE_PICTURE_FAIL;
+
 				msgQSend(ApQ, MSG_STORAGE_SERVICE_PIC_DONE, &flag, sizeof(INT8S), MSG_PRI_NORMAL);
 	            OSMboxPost(avi_encode_ack_m, (void*)C_ACK_SUCCESS);
 	       		break;

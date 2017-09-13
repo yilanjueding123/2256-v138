@@ -13,10 +13,12 @@
 	#define GET_DATA(x)		(*(x) = '\r')
 #endif
 
+
 static CHAR print_buf[PRINT_BUF_SIZE];
 
 void print_string(CHAR *fmt, ...)
 {
+#ifndef UART_TXRX_DATA
     va_list v_list;
     CHAR *pt;
 
@@ -30,6 +32,7 @@ void print_string(CHAR *fmt, ...)
 		SEND_DATA(*pt);
 		pt++;
 	}
+#endif	
 }
 
 void get_string(CHAR *s)
@@ -45,6 +48,64 @@ void get_string(CHAR *s)
         }
         *s++ = (CHAR) temp;
     }
+}
+void uart_send_string(CHAR *fmt, INT32U len)
+{
+    CHAR *pt;
+
+	pt = fmt;
+
+    while (len)
+    {
+		len--;
+        SEND_DATA(*pt);
+        pt++;
+    }
+}
+
+void uart_send_data(CHAR data)
+{
+	CHAR send_buf[11] = {0}, i = 0;
+	INT32S send_temp = 0;
+	send_buf[0] = 0x63;
+	send_buf[1] = data;
+
+	for(i = 2; i < 11; i++)
+	{
+		send_buf[i] = 0x00;
+	}
+	send_buf[6] = 0x88;
+	send_buf[7] = 0x88;
+
+	for(i = 0; i < 9; i++)
+	{
+		send_temp += send_buf[i];
+	}
+
+	__msg("data = %d\n", data);
+	send_buf[10] = (CHAR)send_temp;
+
+	uart_send_string(send_buf, 11);
+}
+
+CHAR* uart_recive_data(void)
+{
+	CHAR* s;
+    INT8U temp;
+
+    while (1)
+    {
+        GET_DATA(&temp);
+        //SEND_DATA(temp);
+        if (temp == '\r')
+        {
+            *s = 0;
+            return;
+        }
+        *s++ = (CHAR) temp;
+		return s;
+    }
+	//return NULL;
 }
 
 #else

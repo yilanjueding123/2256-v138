@@ -1,25 +1,8 @@
----- C_USBDEVICE_PIN Matches (24 in 4 files) ----
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):	gpio_init_io(C_USBDEVICE_PIN, GPIO_INPUT);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):	gpio_set_port_attribute(C_USBDEVICE_PIN, ATTRIBUTE_HIGH);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):	gpio_write_io(C_USBDEVICE_PIN, DATA_LOW);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		if (gpio_read_io(C_USBDEVICE_PIN))
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):	io_temp 			= gpio_read_io(C_USBDEVICE_PIN);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		//		key_map[0].key_io = C_USBDEVICE_PIN;
-Ap_usb.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_usb\src)://  stat = gpio_read_io(C_USBDEVICE_PIN);
-Ap_usb.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_usb\src): // gpio_init_io(C_USBDEVICE_PIN,GPIO_INPUT);
-Ap_usb.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_usb\src)://  gpio_set_port_attribute(C_USBDEVICE_PIN, 0);
-Ap_usb.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_usb\src)://  gpio_write_io(C_USBDEVICE_PIN,0);
-Customer.h (f:\pri_f25\zhibo\2256\v138\programe\project\turnkey_gpdv66xx\inc):#define C_USBDEVICE_PIN   				IO_F15
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_init_io(C_USBDEVICE_PIN,GPIO_INPUT);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_set_port_attribute(C_USBDEVICE_PIN, 0);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_write_io(C_USBDEVICE_PIN,0);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  s_usbd_pin  = gpio_read_io(C_USBDEVICE_PIN); 
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  current_cd_pin = storage_debouce(s_usbd_pin,C_USBDEVICE_PIN,1);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  //       s_usbd_pin =storage_debouce(s_usbd_pin,C_USBDEVICE_PIN,1);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src): //        s_usbd_pin =storage_debouce(s_usbd_pin,C_USBDEVICE_PIN,1);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):        current_cd_pin = storage_debouce(s_usbd_pin,C_USBDEVICE_PIN,1);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  current_cd_pin = storage_debouce(s_usbd_pin,C_USBDEVICE_PIN,1);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_init_io(C_USBDEVICE_PIN,GPIO_INPUT);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_set_port_attribute(C_USBDEVICE_PIN, 0);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src):  gpio_write_io(C_USBDEVICE_PIN,0);
-Storages.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\storages\src)://  s_usbd_pin  = gpio_read_io(C_USBDEVICE_PIN);
+---- VIDEO_KEY Matches (7 in 2 files) ----
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_init_io(VIDEO_KEY, GPIO_OUTPUT);
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_set_port_attribute(VIDEO_KEY, ATTRIBUTE_HIGH);
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_LOW);
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_HIGH);		//开机输出高电平500ms
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_LOW);
+Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		key_map[0].key_io	= VIDEO_KEY;
+Customer.h (f:\pri_f25\zhibo\2256\v138\programe\project\turnkey_gpdv66xx\inc):#define VIDEO_KEY            	 	IO_C10//IO_H3 
