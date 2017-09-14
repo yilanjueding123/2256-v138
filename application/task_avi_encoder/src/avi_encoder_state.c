@@ -498,7 +498,7 @@ void avi_encode_state_task_entry(void *para)
 					frame = *P_CSI_TG_FBSADDR;
 				} while (frame != 0x40000000);
 
-				cpu_draw_time_osd(g_osd_time, pAviEncVidPara->csi_frame_addr[0], pAviEncVidPara->sensor_capture_width);
+				//cpu_draw_time_osd(g_osd_time, pAviEncVidPara->csi_frame_addr[0], pAviEncVidPara->sensor_capture_width);
 			  #if SENSOR_WIDTH==PIC_WIDTH && SENSOR_HEIGHT==PIC_HEIGH
                 encode_size=jpeg_encode_once(PIC_Q_VALUE, C_JPEG_FORMAT_YUYV, PIC_WIDTH, PIC_HEIGH, pAviEncVidPara->csi_frame_addr[0], 0, 0, write_buff_addr);
 				write(pAviEncPara->AviPackerCur->file_handle, write_buff_addr, encode_size);

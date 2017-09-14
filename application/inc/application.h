@@ -1624,7 +1624,7 @@ typedef struct
     INT32U addr;
 } STR_ICON;
 
-extern void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution);
+extern void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution, INT16U fifo_num);
 
 typedef struct {
 	INT16U icon_w;

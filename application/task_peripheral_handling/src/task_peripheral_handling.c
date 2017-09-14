@@ -5,7 +5,7 @@ MSG_Q_ID		PeripheralTaskQ;
 void *			peripheral_task_q_stack[PERIPHERAL_TASK_QUEUE_MAX];
 static INT8U	peripheral_para[PERIPHERAL_TASK_QUEUE_MAX_MSG_LEN];
 extern INT8U usb_state_get(void);
-extern INT8U* uart_recive_data(INT8U* buf);
+extern INT8S* uart_recive_data(INT8S* buf, INT32U len);
 
 INT8U usb_charge_cnt = 0;
 
@@ -23,13 +23,13 @@ void task_peripheral_handling_init(void)
 
 
 //////////////////////////////////////////////////////////////////////////
-INT32S uart_recive_data_set_calendar(INT8U *buf)
+INT32S uart_recive_data_set_calendar(INT8S *buf)
 {
 	INT16U wtemp;
 	INT32S nRet, i;
 	INT8U  data;
 	TIME_T	time_set, time_get;
-	INT8U *pbuf = buf;
+	INT8S *pbuf = buf;
 	
 	if(!buf)
 	{
@@ -44,47 +44,49 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 	}
 	//year
 	wtemp = 0;
-	data = pbuf[1] - 0x30;
-	wtemp += data*1000;
-
-	data = pbuf[2] - 0x30;
+	data = pbuf[1] ;//- 0x30;
 	wtemp += data*100;
 
-	data = pbuf[3] - 0x30;
-	wtemp += data*10;
-
-	data = pbuf[4] - 0x30;
+	data = pbuf[2] ;//- 0x30;
 	wtemp += data*1;
+
+//	data = pbuf[3] ;//- 0x30;
+//	wtemp += data*10;
+
+//	data = pbuf[4] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if((wtemp > 2025) || (wtemp < 2015))
 	{
 		__msg("illege data\n");
+		__msg("wtemp = %d\n", wtemp);
 		return -1;
 	}
 	time_set.tm_year = wtemp;
 	
 	//month
 	wtemp = 0;
-	data = pbuf[5] - 0x30;
-	wtemp += data*10;
-
-	data = pbuf[6] - 0x30;
+	data = pbuf[3] ;//- 0x30;
 	wtemp += data*1;
+
+//	data = pbuf[6] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if(wtemp>12)
 	{
 		__msg("illege month\n");
+		__msg("wtemp = %d\n", wtemp);
 		return -1;
 	}
 	time_set.tm_mon = wtemp;
 	
 	//day
 	wtemp = 0;
-	data = pbuf[7] - 0x30;
-	wtemp += data*10;
-	
-	data = pbuf[8] - 0x30;
+	data = pbuf[4] ;//- 0x30;
 	wtemp += data*1;
+	
+//	data = pbuf[8] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if(wtemp>31)
 	{
@@ -95,11 +97,11 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 	
 	//hour
 	wtemp = 0;
-	data = pbuf[9] - 0x30;
-	wtemp += data*10;
-
-	data = pbuf[10] - 0x30;
+	data = pbuf[5] ;//- 0x30;
 	wtemp += data*1;
+
+//	data = pbuf[10] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if(wtemp>23)
 	{
@@ -110,11 +112,11 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 
 	//minute
 	wtemp = 0;
-	data = pbuf[11] - 0x30;
-	wtemp += data*10;
-
-	data = pbuf[12] - 0x30;
+	data = pbuf[6] ;//- 0x30;
 	wtemp += data*1;
+
+//	data = pbuf[12] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if(wtemp>59)
 	{
@@ -125,11 +127,11 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 
 	//second
 	wtemp = 0;
-	data = pbuf[13] - 0x30;
-	wtemp += data*10;
-
-	data = pbuf[14] - 0x30;
+	data = pbuf[7] ;//- 0x30;
 	wtemp += data*1;
+
+//	data = pbuf[14] ;//- 0x30;
+//	wtemp += data*1;
 	
 	if(wtemp>59)
 	{
@@ -138,16 +140,16 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 	}
 	time_set.tm_sec = wtemp;
 
-	for(i = 1; i<15; i++)
-	{
-		nRet += pbuf[i] - 0x30;
-		if((INT8U)nRet != pbuf[15])
-		{
-			__msg("modify error\n");
-			return -1;
-		}
-	}
-	if(pbuf[16] != 0xee)
+//	for(i = 1; i<10; i++)
+//	{
+//		nRet += pbuf[i]; //- 0x30;
+//		if((INT8U)nRet != pbuf[15])
+//		{
+//			__msg("modify error\n");
+//			return -1;
+//		}
+//	}
+	if(pbuf[9] != 0xee)
 	{
 		__msg("data recive error\n");
 		return -1;
@@ -156,7 +158,7 @@ INT32S uart_recive_data_set_calendar(INT8U *buf)
 	
 	cal_time_set(time_set);
 	cal_time_get(&time_get);
-	__msg("%d/%d/%d %d:%d%d\n", time_get.tm_year, time_get.tm_mon, time_get.tm_mday, time_get.tm_hour,\
+	__msg("%d/%d/%d %d:%d:%d\n", time_get.tm_year, time_get.tm_mon, time_get.tm_mday, time_get.tm_hour,\
 		time_get.tm_min, time_get.tm_sec);
 	
 	return 0;
@@ -169,7 +171,7 @@ INT8U			card_space_less_flag = 0;
 void task_peripheral_handling_entry(void * para)
 {
 	INT32U			msg_id;
-	INT8U 			*recive_buf;
+	INT8S 			recive_buf[10];
 	INT32U			type;
 	INT8U			usbd_debounce_cnt;
 	INT8U usb_detect_start;
@@ -179,7 +181,7 @@ void task_peripheral_handling_entry(void * para)
 	//	INT8U  bat_check;
 	usb_detect_start	= 0;
 	bat_ck_timerid		= 0xFF;
-
+			
 	//	bat_check=0;
 	usbd_debounce_cnt	= 0;
 	task_peripheral_handling_init();
@@ -253,14 +255,16 @@ void task_peripheral_handling_entry(void * para)
 						usb_charge_cnt		= 0;
 					}
 				}
-				if(++send_cnt > 64)
+				if((++send_cnt > 63))
 				{
 					//uart_send_data(send_cnt--);
 					send_cnt = 0;
-//					if(uart_recive_data(recive_buf))
-//					{
-//						uart_recive_data_set_calendar(recive_buf);
-//					}
+					
+
+					if(uart_recive_data(recive_buf, 10))
+					{
+						uart_recive_data_set_calendar(recive_buf);
+					}
 				}
 				
 				if (usb_detect_start == 1)

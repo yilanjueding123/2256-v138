@@ -27,7 +27,21 @@ capture_photo_args_t capture_photo_args = {0};
 	#define C_CMOS_FRAME_QUEUE_MAX	1024/SENSOR_FIFO_LINE	//for sensor height = 1024
 #endif
 
+#define DISP_CHAR_HIGH   19
+
 const INT8U *number[] = {	
+#if 1 //DISP_CHAR_HIGH == 19
+	acFontHZArial01700030, 
+	acFontHZArial01700031, 
+	acFontHZArial01700032,
+	acFontHZArial01700033, 
+	acFontHZArial01700034,
+	acFontHZArial01700035,
+	acFontHZArial01700036,
+	acFontHZArial01700037, 
+	acFontHZArial01700038,
+	acFontHZArial01700039 
+#else
 	acFontHZArial01100030,
 	acFontHZArial01100031,
 	acFontHZArial01100032,
@@ -38,16 +52,7 @@ const INT8U *number[] = {
 	acFontHZArial01100037,
 	acFontHZArial01100038,
 	acFontHZArial01100039
-//	acFontHZArial01700030, 
-//	acFontHZArial01700031, 
-//	acFontHZArial01700032,
-//	acFontHZArial01700033, 
-//	acFontHZArial01700034,
-//	acFontHZArial01700035,
-//	acFontHZArial01700036,
-//	acFontHZArial01700037, 
-//	acFontHZArial01700038,
-//	acFontHZArial01700039 
+#endif
 };
 
 /* os tsak stack */
@@ -98,6 +103,9 @@ void dynamic_tune_jpeg_Q(INT32U vlcSize)
 //=======================================================================
 //  Draw OSD function
 //=======================================================================
+#define DISP_OSD_START_FIFO_POTION      42
+#define DISP_OSD_FIFO_LINE              6
+/*
 void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, INT16U res){	
 	const INT8U* chptr;
 	INT8U i,j,tmp;
@@ -126,113 +134,192 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
  		ptr += (res-8)*2;
  	}
 } 
+*/
+void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, INT16U res, INT16U fifo_num){	
+	const INT8U* chptr;
+	INT8U i;
+	register INT8U tmp;
+    register INT32U *ptr;
+	register INT32U color_value;
+	INT8U char_line_flag = 1;
+
+	color_value = 0xe301e393;
+	ptr = (INT32U*) target_addr;
+	ptr += offset/4;
+	chptr = source_addr;
+
+	if (fifo_num == DISP_OSD_START_FIFO_POTION)
+	{
+	 	for(i=0; i<DISP_OSD_FIFO_LINE; i++)
+		{
+			tmp = *chptr++;
+			if (tmp&0x80) *ptr = color_value; ptr++;
+			if (tmp&0x40) *ptr = color_value; ptr++;
+			if (tmp&0x20) *ptr = color_value; ptr++;
+			if (tmp&0x10) *ptr = color_value; ptr++;
+			if (tmp&0x08) *ptr = color_value; ptr++;
+			if (tmp&0x04) *ptr = color_value; ptr++;
+			if (tmp&0x02) *ptr = color_value; ptr++;
+			if (tmp&0x01) *ptr = color_value; ptr++;
+			ptr += ((1280 - 16)*2)/4;
+	 	}
+	}
+	else if (fifo_num == (DISP_OSD_START_FIFO_POTION+1))
+	{
+		if (char_line_flag == 1)
+		{
+			chptr += DISP_OSD_FIFO_LINE;
+			char_line_flag = 0;
+		}
+	 	for(i=0; i<(DISP_CHAR_HIGH - DISP_OSD_FIFO_LINE); i++)
+		{
+			tmp = *chptr++;
+			if (tmp&0x80) *ptr = color_value; ptr++;
+			if (tmp&0x40) *ptr = color_value; ptr++;
+			if (tmp&0x20) *ptr = color_value; ptr++;
+			if (tmp&0x10) *ptr = color_value; ptr++;
+			if (tmp&0x08) *ptr = color_value; ptr++;
+			if (tmp&0x04) *ptr = color_value; ptr++;
+			if (tmp&0x02) *ptr = color_value; ptr++;
+			if (tmp&0x01) *ptr = color_value; ptr++;
+			ptr += ((1280 - 16)*2)/4;
+	 	}
+	}
+/*
+	INT8U i,j,tmp;
+	INT8U *ptr;
+	
+	ptr = (INT8U*) target_addr;
+	ptr+= offset;
+	chptr = source_addr;
+	if (fifo_num == DISP_OSD_START_FIFO_POTION)
+	{
+		for(i=0;i<DISP_OSD_FIFO_LINE;i++)
+		{
+			tmp = *chptr++;
+			for(j=0;j<8;j++)
+			{
+				if(tmp&0x80)
+				{	
+					*ptr++ =0x80;
+					*ptr++ = 0xff - 0xf0;			//osd color
+				}
+				else
+				{
+					ptr += 2;
+				}	
+				tmp = tmp<<1;
+			}
+	 		ptr += (res-8)*2;
+		}
+	}
+	else if (fifo_num == (DISP_OSD_START_FIFO_POTION+1))
+	{
+		if (char_line_flag == 1)
+		{
+			chptr += DISP_OSD_FIFO_LINE+1;
+			char_line_flag = 0;
+		}
+		for(i=0;i<(DISP_CHAR_HIGH - DISP_OSD_FIFO_LINE);i++)
+		{		
+			tmp = *chptr++;
+			for(j=0;j<8;j++)
+			{
+				if(tmp&0x80)
+				{	
+					*ptr++ =0x80;
+					*ptr++ = 0xff - 0xf0;			//osd color
+				}
+				else
+				{
+					ptr += 2;
+				}	
+				tmp = tmp<<1;
+			}
+	 		ptr += (res-8)*2;
+		}	
+	}
+*/	
+} 
 //=======================================================================
 //  Draw OSD function
 //=======================================================================
-void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution)
+void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution, INT16U fifo_num)
 {
 	INT8U  data;
 	INT16U offset, space, wtemp;
 	INT32U line;
 	
+	if (fifo_num < DISP_OSD_START_FIFO_POTION) return;
 	
-  #if VIDEO_ENCODE_USE_MODE == SENSOR_BUF_FRAME_MODE
-	if (resolution == 640) 
-	{
-		line = target_buffer + 400*resolution*2;
-		offset = 430*2;
-	}
-	else if (resolution == 720) 
-	{
-		line = target_buffer + 400*resolution*2;
-		offset = 480*2;
-	}
-	else if (resolution == 1280) 
-	{
-		line = target_buffer + 700*resolution*2;
-		offset = 1000*2;
-	} 
-	else 
-	{
-		return;
-	}
-  #else
-	if (resolution == 640) 
-	{
-		line = target_buffer + 8*resolution*2;
-		offset = 430*2;
-	} 
-	else if (resolution == 720) 
-	{
-		line = target_buffer + 8*resolution*2;
-		offset = 480*2;
-	} 
-	else if (resolution == 1280) 
-	{
-		line = target_buffer + 8*resolution*2;
-		offset = 1000*2;
-	} 
-	else 
-	{
-		return;
-	}
-  #endif
 
-	space = 22;//16;
+	if (fifo_num == DISP_OSD_START_FIFO_POTION)
+	{
+		line = target_buffer + (SENSOR_FIFO_LINE - DISP_OSD_FIFO_LINE) * resolution*2;
+	}
+	else if (fifo_num == (DISP_OSD_START_FIFO_POTION+1))
+	{
+		line = target_buffer; // + (DISP_CHAR_HIGH - DISP_OSD_FIFO_LINE) * resolution*2;
+	}
+	
+	offset = 500*2; //1000*2;
+
+
+	space = 18*2; //
 	//Arial 17
 	// year
 	if (current_time.tm_year > 2008) {
 		wtemp = current_time.tm_year - 2000;
-		cpu_draw_osd(number[2], line, offset, resolution);
-		cpu_draw_osd(number[0],line,offset+space*1,resolution);
+		cpu_draw_osd(number[2], line, offset, resolution, fifo_num);
+		cpu_draw_osd(number[0],line,offset+space*1,resolution, fifo_num);
 		data = wtemp/10;
 		wtemp -= data*10;
-		cpu_draw_osd(number[data],line,offset+space*2,resolution);
+		cpu_draw_osd(number[data],line,offset+space*2,resolution, fifo_num);
 		data = wtemp;
-		cpu_draw_osd(number[data],line,offset+space*3,resolution);
+		cpu_draw_osd(number[data],line,offset+space*3,resolution, fifo_num);
 	} else {
-		cpu_draw_osd(number[2], line, offset, resolution);
-		cpu_draw_osd(number[0],line,offset+space*1,resolution);
-		cpu_draw_osd(number[0],line,offset+space*2,resolution);
-		cpu_draw_osd(number[8],line,offset+space*3,resolution);
+		cpu_draw_osd(number[2], line, offset, resolution, fifo_num);
+		cpu_draw_osd(number[0],line,offset+space*1,resolution, fifo_num);
+		cpu_draw_osd(number[0],line,offset+space*2,resolution, fifo_num);
+		cpu_draw_osd(number[8],line,offset+space*3,resolution, fifo_num);
 	}
 	
 	// :
-	cpu_draw_osd(acFontHZArial017Slash,line,offset+space*4,resolution);
+	cpu_draw_osd(acFontHZArial017Slash,line,offset+space*4,resolution, fifo_num);
 	
 	//month
 	wtemp = current_time.tm_mon; 
-	cpu_draw_osd(number[wtemp/10],line,offset+space*5,resolution);
-	cpu_draw_osd(number[wtemp%10],line,offset+space*6,resolution);
+	cpu_draw_osd(number[wtemp/10],line,offset+space*5,resolution, fifo_num);
+	cpu_draw_osd(number[wtemp%10],line,offset+space*6,resolution, fifo_num);
 	
 	//:
-	cpu_draw_osd(acFontHZArial017Slash,line,offset+space*7,resolution);
+	cpu_draw_osd(acFontHZArial017Slash,line,offset+space*7,resolution, fifo_num);
 	
 	//day
 	wtemp = current_time.tm_mday;
-	cpu_draw_osd(number[wtemp/10],line,offset+space*8,resolution);
-	cpu_draw_osd(number[wtemp%10],line,offset+space*9,resolution);
+	cpu_draw_osd(number[wtemp/10],line,offset+space*8,resolution, fifo_num);
+	cpu_draw_osd(number[wtemp%10],line,offset+space*9,resolution, fifo_num);
 	
 	//hour
 	wtemp = current_time.tm_hour;
-	cpu_draw_osd(number[wtemp/10],line,offset+space*11,resolution);
-	cpu_draw_osd(number[wtemp%10],line,offset+space*12,resolution);
+	cpu_draw_osd(number[wtemp/10],line,offset+space*11,resolution, fifo_num);
+	cpu_draw_osd(number[wtemp%10],line,offset+space*12,resolution, fifo_num);
 	
 	// :
-	cpu_draw_osd(acFontHZArial017Comma, line,offset+space*13,resolution);
+	cpu_draw_osd(acFontHZArial017Comma, line,offset+space*13,resolution, fifo_num);
 	
 	//minute
 	wtemp = current_time.tm_min;
-	cpu_draw_osd(number[wtemp/10],line,offset+space*14,resolution);
-	cpu_draw_osd(number[wtemp%10],line,offset+space*15,resolution);
+	cpu_draw_osd(number[wtemp/10],line,offset+space*14,resolution, fifo_num);
+	cpu_draw_osd(number[wtemp%10],line,offset+space*15,resolution, fifo_num);
 	
 	// :
-	cpu_draw_osd(acFontHZArial017Comma,line,offset+space*16,resolution);
+	cpu_draw_osd(acFontHZArial017Comma,line,offset+space*16,resolution, fifo_num);
 	
 	//second
 	wtemp = current_time.tm_sec;
-	cpu_draw_osd(number[wtemp/10], line,offset+space*17,resolution);
-	cpu_draw_osd(number[wtemp%10],line,offset+space*18,resolution);	
+	cpu_draw_osd(number[wtemp/10], line,offset+space*17,resolution, fifo_num);
+	cpu_draw_osd(number[wtemp%10],line,offset+space*18,resolution, fifo_num);	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // scaler task
@@ -561,6 +648,8 @@ void video_encode_task_entry(void *parm)
 	ISOTaskMsg isosend;
 #endif
 
+	TIME_T	display_osd_time;
+
 	while(1)
 	{
 		msg_id = (INT32U) OSQPend(vid_enc_task_q, 0, &err);
@@ -680,7 +769,7 @@ void video_encode_task_entry(void *parm)
 			if (s_usbd_pin == 0) {
 				TIME_T	g_osd_time;
 				cal_time_get(&g_osd_time);
-				cpu_draw_time_osd(g_osd_time, scaler_frame, AVI_WIDTH);
+				//cpu_draw_time_osd(g_osd_time, scaler_frame, AVI_WIDTH);
 			}
 
 			if(pAviEncVidPara->video_format == C_MJPG_FORMAT)
@@ -733,10 +822,10 @@ VIDEO_ENCODE_FRAME_MODE_END:
 				//DBG_PRINT("(%d)", pAviEncPara->vid_pend_cnt);  //test
 				if (pAviEncPara->vid_pend_cnt == pAviEncPara->vid_post_cnt) {
 					pAviEncPara->vid_pend_cnt = 0;
-					//DBG_PRINT("e");
+					DBG_PRINT("e");
 				} else {
 					pAviEncPara->vid_pend_cnt = 0xFF;
-					//DBG_PRINT("f");
+					DBG_PRINT("f");
 				}
 			}
 
@@ -750,7 +839,8 @@ VIDEO_ENCODE_FRAME_MODE_END:
 				// start_capture_flag = 0;
 				if (pAviEncPara->vid_pend_cnt == 0) 
 				{
-					if (jpeg_start_flag && !(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) 
+					/*
+					if (avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) 
 					{
 						{
 							TIME_T	g_osd_time;
@@ -758,7 +848,7 @@ VIDEO_ENCODE_FRAME_MODE_END:
 							cpu_draw_time_osd(g_osd_time, y_frame, 1280);
 						}
 					}
-				
+					*/
 					nRet = 3;
 				}
 				else if (pAviEncPara->vid_pend_cnt == 1) 
@@ -796,6 +886,22 @@ VIDEO_ENCODE_FRAME_MODE_END:
 				*/
 				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) 
 				{
+					if (1) //(!(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) 
+					{
+						{
+							TIME_T	g_osd_time;
+							if (pAviEncPara->vid_pend_cnt == DISP_OSD_START_FIFO_POTION)
+							{
+								cal_time_get(&g_osd_time);
+								display_osd_time = g_osd_time;
+							}
+							else if (pAviEncPara->vid_pend_cnt == (DISP_OSD_START_FIFO_POTION+1))
+							{
+								g_osd_time = display_osd_time;
+							}
+							cpu_draw_time_osd(g_osd_time, y_frame, 1280, pAviEncPara->vid_pend_cnt);
+						}
+					}
 					nRet = 2;			// Intermediate sensor image FIFO which is not used
 				}
 				else 
@@ -808,8 +914,9 @@ VIDEO_ENCODE_FRAME_MODE_END:
 			{	
 				if (pAviEncPara->vid_pend_cnt == 0) 
 				{
-					if (!(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)/* && jpeg_start_flag*/) 
-					{
+				
+					//if (!(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)/* && jpeg_start_flag*/) 
+					/*{
 						TIME_T	g_osd_time;
 
 						cal_time_get(&g_osd_time);
@@ -819,13 +926,14 @@ VIDEO_ENCODE_FRAME_MODE_END:
 						cpu_draw_time_osd(g_osd_time, y_frame, SENSOR_WIDTH);
 					  #endif
 					}
+					*/
 					nRet = 3;
 				} 
 				else if (pAviEncPara->vid_pend_cnt == 1) 
 				{
 					nRet = 1;
 				} 
-				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) 
+				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt)
 				{
 					nRet = 2;
 				}

@@ -61,7 +61,7 @@
 #define AVI_Q_VALUE						50//30		// 40, 50, 60
 #define AVI_FRAME_RATE					30		// Frame per second
 
-//#define UART_TXRX_DATA
+#define UART_TXRX_DATA
 #define UART0_BAUD_TXRX_RATE			115200
 
 /*

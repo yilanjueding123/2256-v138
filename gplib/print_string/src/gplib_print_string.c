@@ -18,7 +18,7 @@ static CHAR print_buf[PRINT_BUF_SIZE];
 
 void print_string(CHAR *fmt, ...)
 {
-#ifndef UART_TXRX_DATA
+#ifdef UART_TXRX_DATA
     va_list v_list;
     CHAR *pt;
 
@@ -67,44 +67,44 @@ void uart_send_data(CHAR data)
 {
 	CHAR send_buf[11] = {0}, i = 0;
 	INT32S send_temp = 0;
-	send_buf[0] = 0x63;
-	send_buf[1] = data;
+	
+//	send_buf[0] = 0x55;
+//	send_buf[1] = 0x16;
+//	send_buf[2] = 0x11;
+//	send_buf[3] = 0x09;
+//	send_buf[4] = 0x0e;
+//	send_buf[5] = 0x10;
+//	send_buf[6] = 0x37;
+//	send_buf[7] = 0x22;
+//	send_buf[8] = 0x00;
+//	send_buf[9] = 0xaa;
 
-	for(i = 2; i < 11; i++)
-	{
-		send_buf[i] = 0x00;
-	}
-	send_buf[6] = 0x88;
-	send_buf[7] = 0x88;
+	//send_buf[2] = 0x55;
 
-	for(i = 0; i < 9; i++)
-	{
-		send_temp += send_buf[i];
-	}
 
-	__msg("data = %d\n", data);
-	send_buf[10] = (CHAR)send_temp;
-
-	uart_send_string(send_buf, 11);
+	uart_send_string(send_buf, 10);
 }
 
-INT8U* uart_recive_data(INT8U* buf)
+INT8S* uart_recive_data(INT8S* buf, INT32U len)
 {
-	INT8U* s = buf;
     INT8U temp;
+	INT32U i;
+	
+	gp_memset(buf,0,len);
+	
+	//for(i = 0; i<len; i++)
+	{
+		GET_DATA((INT8U*)buf);
 
-    while (1)
-    {
-        GET_DATA(&temp);
-        //SEND_DATA(temp);
-        if ((temp == '\r')||(temp == ' '))
-        {
-            //*s = 0;
-            return s;
-        }
-        *s++ = (CHAR) temp;
-		//return s;
-    }
+//		if(gp_strlen(buf) != 10)
+//		{
+//			return NULL;
+//		}
+		//buf[i] = temp;
+        //uart_send_data((CHAR)temp);
+	}
+	
+	return buf;
 }
 
 #else
