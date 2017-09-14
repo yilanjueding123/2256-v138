@@ -1,8 +1,4 @@
----- VIDEO_KEY Matches (7 in 2 files) ----
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_init_io(VIDEO_KEY, GPIO_OUTPUT);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_set_port_attribute(VIDEO_KEY, ATTRIBUTE_HIGH);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_LOW);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_HIGH);		//开机输出高电平500ms
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		gpio_write_io(VIDEO_KEY, DATA_LOW);
-Ap_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):		key_map[0].key_io	= VIDEO_KEY;
-Customer.h (f:\pri_f25\zhibo\2256\v138\programe\project\turnkey_gpdv66xx\inc):#define VIDEO_KEY            	 	IO_C10//IO_H3 
+---- IO_H2 Matches (3 in 3 files) ----
+Driver_l1.h (f:\pri_f25\zhibo\2256\v138\programe\driver_l1\inc):    IO_H2 ,
+Drv_l1_gpio.c (f:\pri_f25\zhibo\2256\v138\programe\driver_l1\common\src):    gpio_drving_init_io(IO_H2,(IO_DRV_LEVEL) UART_TX_RX_DRIVING);
+Drv_l1_gpio.h (f:\pri_f25\zhibo\2256\v138\programe\driver_l1\common\inc):    IO_H2 ,

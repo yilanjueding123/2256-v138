@@ -28,16 +28,26 @@ capture_photo_args_t capture_photo_args = {0};
 #endif
 
 const INT8U *number[] = {	
-	acFontHZArial01700030, 
-	acFontHZArial01700031, 
-	acFontHZArial01700032,
-	acFontHZArial01700033, 
-	acFontHZArial01700034,
-	acFontHZArial01700035,
-	acFontHZArial01700036,
-	acFontHZArial01700037, 
-	acFontHZArial01700038,
-	acFontHZArial01700039 
+	acFontHZArial01100030,
+	acFontHZArial01100031,
+	acFontHZArial01100032,
+	acFontHZArial01100033,
+	acFontHZArial01100034,
+	acFontHZArial01100035,
+	acFontHZArial01100036,
+	acFontHZArial01100037,
+	acFontHZArial01100038,
+	acFontHZArial01100039
+//	acFontHZArial01700030, 
+//	acFontHZArial01700031, 
+//	acFontHZArial01700032,
+//	acFontHZArial01700033, 
+//	acFontHZArial01700034,
+//	acFontHZArial01700035,
+//	acFontHZArial01700036,
+//	acFontHZArial01700037, 
+//	acFontHZArial01700038,
+//	acFontHZArial01700039 
 };
 
 /* os tsak stack */
@@ -96,13 +106,15 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 	ptr = (INT8U*) target_addr;
 	ptr+= offset;
 	chptr = source_addr;
-	for(i=0;i<19;i++){
+	for(i=0;i<14;i++)
+	{
 		tmp = *chptr++;
-		for(j=0;j<8;j++){
+		for(j=0;j<8;j++)
+		{
 			if(tmp&0x80)
 			{	
 				*ptr++ =0x80;
-				*ptr++ = 0xff;
+				*ptr++ = 0xff;			//osd color
 			}
 			else
 			{
@@ -110,325 +122,63 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 			}	
 			tmp = tmp<<1;
 		}
- 	//ptr += (320-8)*2;
- 	ptr += (res-8)*2;
+ 		//ptr += (320-8)*2;
+ 		ptr += (res-8)*2;
  	}
 } 
 //=======================================================================
 //  Draw OSD function
 //=======================================================================
-#ifdef	GPVC_1247_OSD
-
-extern INT32S ap_state_resource_char_draw_osd(INT16U target_char, INT16U *frame_buff, STRING_INFO *str_info, INT8U type, INT8U num_type);
-extern INT16S ap_state_resource_time_stamp_position_x_get(void);
-extern INT16S ap_state_resource_time_stamp_position_y_get(void);
-extern INT8U FIFO_LINE_LN ;
-extern INT8U display_osd_flag;
-
-void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT8U draw_type, INT8U state)
-{
-#if 1
-	 INT32S tm1;
-	 INT16S gap_1, gap_2;
-	 STRING_INFO str_info = {0};
-	 INT8U enable_draw_time_flag = 0;
-	 INT8U year_mon_day_format = 0;
- 
-#if 0 // 穦耑FIFO
-	 if(current_time.tm_year > 2099) {
-		 current_time.tm_year = 2000;
-		 cal_time_set(current_time);
-	 }
-#endif
-	 str_info.language = LCD_EN;
- 
-	 if(((state & 0xF) == (STATE_VIDEO_RECORD & 0xF)) || ((state & 0xF) == (STATE_VIDEO_PREVIEW & 0xF))) {
-		 gap_1 = 3;
-		 gap_2 = 20;
-		 str_info.font_color = 0xFF80;	 //white	 //0x5050;	 //green
-		 str_info.pos_x = ap_state_resource_time_stamp_position_x_get();//时间标签的x坐标,默认是从0开始
- 
-		 // Video Recording
-		 if((state & 0xF) == (STATE_VIDEO_RECORD & 0xF))
-		 {
-			 if(FIFO_LINE_LN == 16)
-			 {
-				 // 字高40,使用3個fifo(16 line)來加上時間 
-				 if(state & 0x80)
-				 {	 // The last part of date stamp
-					 str_info.pos_y = 0;
-					 str_info.font_offset_h = 28;
-				 }
-				 else if(state & 0x40)
-				 {	 // The 2nd part of date stamp 
-					 str_info.pos_y = 0;
-					 str_info.font_offset_h = 12;
-				 }
-				 else
-				 {	 // The first part of date stamp
-					 str_info.pos_y = 4;
-					 str_info.font_offset_h = 0;
-				 }
-			 }
-			 else
-			 {
-				 // 字高40,使用2個fifo(32 line)來加上時間 
-				 if(state & 0x40)
-				 {	 // The 2nd part of date stamp 
-					 str_info.pos_y = 0;
-					 str_info.font_offset_h = 20;
-				 }
-				 else
-				 {	 // The first part of date stamp
-					 str_info.pos_y = 12;
-					 str_info.font_offset_h = 0;
-				 }
-			 }
-		 } 
-		 else
-		 {	 // Capture Photo
-			 if(my_pAviEncVidPara->sensor_height == AVI_HEIGHT_720P)
-			 {
-				 str_info.pos_y = 651;
-			 }
-			 else if (my_pAviEncVidPara->sensor_height == AVI_HEIGHT_WVGA)
-			 {
-				 str_info.pos_y = 434;
-			 }
-			 else // AVI_HEIGHT_QVGA
-			 {
-				 str_info.pos_y = 217;
-			 }
-		 }
- 
-		 str_info.buff_w = my_pAviEncVidPara->sensor_width;
- 
-		 if((state & 0xF) == (STATE_VIDEO_RECORD & 0xF))	 
-		 {
-			 str_info.buff_h = FIFO_LINE_LN; // Fifo line length
-		 }
-		 else
-		 {
-			 str_info.buff_h = my_pAviEncVidPara->sensor_height;
-		 }
-		 
-	 } else {
-		 gap_1 = 2;
-		 gap_2 = 8;
-		 str_info.font_color = 0xFFFF;	 //white
-		 str_info.pos_x = ap_state_resource_time_stamp_position_x_get()/2;
-		 str_info.pos_y = ap_state_resource_time_stamp_position_y_get()/2;
-		 str_info.buff_w = TFT_WIDTH;
-		 str_info.buff_h = TFT_HEIGHT;
-	 }
- 
- 
-	 enable_draw_time_flag = draw_type & 0xF0;
-	 draw_type &= 0x0F;
- 
-	 year_mon_day_format = ap_state_config_data_time_mode_get();
-	 if(display_osd_flag){
-	 switch(year_mon_day_format)
-	 {
-		 case 0:  // Y/M/D
-		 default:
-			 tm1 = current_time.tm_year/1000;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*1000;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/100;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*100;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_mon/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mon -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_mday/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mday -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_2;		 
-		 break;
- 
-		 case 1:  // D/M/Y
-			 tm1 = current_time.tm_mday/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mday -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;		 
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_mon/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mon -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/1000;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*1000;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/100;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*100;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_2;
-		 break;
- 
-		 case 2:  // M/D/Y
-			 tm1 = current_time.tm_mon/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mon -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mon+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_mday/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_mday -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_mday+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_1;		 
- 
-			 ap_state_resource_char_draw_osd(0x2F, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  "/"
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/1000;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*1000;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/100;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*100;
-			 str_info.pos_x += gap_1;
- 
-			 tm1 = current_time.tm_year/10;
-			 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 current_time.tm_year -= tm1*10;
-			 str_info.pos_x += gap_1;
- 
-			 ap_state_resource_char_draw_osd(current_time.tm_year+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-			 str_info.pos_x += gap_2;
-		 break;
-	 }
- 
-	 if(enable_draw_time_flag == DRAW_DATE_TIME)
-	 {
-		 tm1 = current_time.tm_hour/10;
-		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-		 current_time.tm_hour -= tm1*10;
-		 str_info.pos_x += gap_1;
- 
-		 ap_state_resource_char_draw_osd(current_time.tm_hour+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-		 str_info.pos_x += gap_1;
- 
-		 ap_state_resource_char_draw_osd(0x3A, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  ":"
-		 str_info.pos_x += gap_1;
- 
-		 tm1 = current_time.tm_min/10;
-		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-		 current_time.tm_min -= tm1*10;
-		 str_info.pos_x += gap_1;
- 
-		 ap_state_resource_char_draw_osd(current_time.tm_min+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-		 str_info.pos_x += gap_1;
- 
-		 ap_state_resource_char_draw_osd(0x3A, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);		 //  ":"
-		 str_info.pos_x += gap_1;
- 
-		 tm1 = current_time.tm_sec/10;
-		 ap_state_resource_char_draw_osd(tm1+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-		 current_time.tm_sec -= tm1*10;
-		 str_info.pos_x += gap_1;
- 
-		 ap_state_resource_char_draw_osd(current_time.tm_sec+0x30, (INT16U *) target_buffer, &str_info, draw_type, (state == (STATE_AUDIO_RECORD & 0xF))?2:1);
-	 }
-		}
- #endif
- }
-
-#else 
 void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution)
 {
 	INT8U  data;
 	INT16U offset, space, wtemp;
 	INT32U line;
-
+	
+	
   #if VIDEO_ENCODE_USE_MODE == SENSOR_BUF_FRAME_MODE
-	if (resolution == 640) {
+	if (resolution == 640) 
+	{
 		line = target_buffer + 400*resolution*2;
 		offset = 430*2;
-	} else if (resolution == 720) {
+	}
+	else if (resolution == 720) 
+	{
 		line = target_buffer + 400*resolution*2;
 		offset = 480*2;
-	} else if (resolution == 1280) {
+	}
+	else if (resolution == 1280) 
+	{
 		line = target_buffer + 700*resolution*2;
 		offset = 1000*2;
-	} else {
+	} 
+	else 
+	{
 		return;
 	}
   #else
-	if (resolution == 640) {
+	if (resolution == 640) 
+	{
 		line = target_buffer + 8*resolution*2;
 		offset = 430*2;
-	} else if (resolution == 720) {
+	} 
+	else if (resolution == 720) 
+	{
 		line = target_buffer + 8*resolution*2;
 		offset = 480*2;
-	} else if (resolution == 1280) {
+	} 
+	else if (resolution == 1280) 
+	{
 		line = target_buffer + 8*resolution*2;
 		offset = 1000*2;
-	} else {
+	} 
+	else 
+	{
 		return;
 	}
   #endif
 
-	space = 16;
+	space = 22;//16;
 	//Arial 17
 	// year
 	if (current_time.tm_year > 2008) {
@@ -484,7 +234,6 @@ void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolut
 	cpu_draw_osd(number[wtemp/10], line,offset+space*17,resolution);
 	cpu_draw_osd(number[wtemp%10],line,offset+space*18,resolution);	
 }
-#endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // scaler task
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -996,21 +745,37 @@ VIDEO_ENCODE_FRAME_MODE_END:
 //goto VIDEO_ENCODE_FIFO_MODE_END;
 
 			//if (pAviEncVidPara->encode_width==1280 && pAviEncVidPara->encode_height==720 && capture_ready == 0) {
-			if (pAviEncVidPara->encode_width==1280 && pAviEncVidPara->encode_height==720) {
-
+			if (pAviEncVidPara->encode_width==1280 && pAviEncVidPara->encode_height==720) 
+			{
 				// start_capture_flag = 0;
-				if (pAviEncPara->vid_pend_cnt == 0) {
+				if (pAviEncPara->vid_pend_cnt == 0) 
+				{
+					if (jpeg_start_flag && !(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) 
+					{
+						{
+							TIME_T	g_osd_time;
+							cal_time_get(&g_osd_time);
+							cpu_draw_time_osd(g_osd_time, y_frame, 1280);
+						}
+					}
+				
 					nRet = 3;
 				}
-				else if (pAviEncPara->vid_pend_cnt == 1) {
-				//	jpeg_start_flag = 1;
+				else if (pAviEncPara->vid_pend_cnt == 1) 
+				{
+					//jpeg_start_flag = 1;
 					nRet = 1;			// First sensor image FIFO
-/*
-				} else if (pAviEncPara->vid_pend_cnt < 0xB) {
+				}
+				/*
+				else if (pAviEncPara->vid_pend_cnt < 0xB) 
+				{
 					nRet = 2;			// Intermediate sensor image FIFO
-				} else if (pAviEncPara->vid_pend_cnt == 0xB) {
+				} 
+				else if (pAviEncPara->vid_pend_cnt == 0xB)
+				{
 					// Draw date and time watermark in this FIFO
-					if (jpeg_start_flag && !(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) {
+					if (jpeg_start_flag && !(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)) 
+					{
 						{
 							TIME_T	g_osd_time;
 							cal_time_get(&g_osd_time);
@@ -1018,22 +783,33 @@ VIDEO_ENCODE_FRAME_MODE_END:
 						}
 					}
 					nRet = 2;
-				} else if (pAviEncPara->vid_pend_cnt == 0xC) {
+				} 
+				else if (pAviEncPara->vid_pend_cnt == 0xC) 
+				{
 				   
 					nRet = 3;			// Last sensor image FIFO that is used
-				} else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) {
+				} 
+				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) 
+				{
 					nRet = 4;			// Intermediate sensor image FIFO which is not used
-*/
-				} else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) {
+				}
+				*/
+				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) 
+				{
 					nRet = 2;			// Intermediate sensor image FIFO which is not used
-				} else {
+				}
+				else 
+				{
 					nRet = 4;
 					pAviEncPara->vid_pend_cnt = 0; 
 				}
 			}	
-			else {	
-				if (pAviEncPara->vid_pend_cnt == 0) {
-					if (!(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)/* && jpeg_start_flag*/) {
+			else 
+			{	
+				if (pAviEncPara->vid_pend_cnt == 0) 
+				{
+					if (!(avi_encode_get_status() & C_AVI_ENCODE_USB_WEBCAM)/* && jpeg_start_flag*/) 
+					{
 						TIME_T	g_osd_time;
 
 						cal_time_get(&g_osd_time);
@@ -1044,14 +820,22 @@ VIDEO_ENCODE_FRAME_MODE_END:
 					  #endif
 					}
 					nRet = 3;
-				} else if (pAviEncPara->vid_pend_cnt == 1) {
+				} 
+				else if (pAviEncPara->vid_pend_cnt == 1) 
+				{
 					nRet = 1;
-				} else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) {
+				} 
+				else if (pAviEncPara->vid_pend_cnt < pAviEncPara->vid_post_cnt) 
+				{
 					nRet = 2;
-				} else if (pAviEncPara->vid_pend_cnt == 0xFF) {
+				}
+				else if (pAviEncPara->vid_pend_cnt == 0xFF)
+				{
 					pAviEncPara->vid_pend_cnt = 0;
 					nRet = 4;
-				} else {
+				}
+				else 
+				{
 					nRet = 4;
 				}
 			}	

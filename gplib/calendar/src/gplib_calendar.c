@@ -187,10 +187,11 @@ INT32S cal_time_get(TIME_T  *tm)
         tm->tm_sec = r_time.rtc_sec;
     	tm->tm_min = r_time.rtc_min;
     	tm->tm_hour = r_time.rtc_hour;
-    	tm->tm_year = 2007;//2008;
-    	tm->tm_mon =12;//8;
-   		tm->tm_mday = 31;//8;
+    	tm->tm_year = 2007;
+    	tm->tm_mon =12;
+   		tm->tm_mday = 31;
    		tm->tm_wday = 4;
+
     	return STATUS_FAIL;
     }
 
@@ -271,7 +272,7 @@ INT32S cal_time_get(TIME_T  *tm)
     tm->tm_year = y;
     tm->tm_mon = m;
     tm->tm_mday = d;
-            
+    
     return STATUS_OK;
 }
 

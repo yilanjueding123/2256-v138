@@ -10,11 +10,6 @@ INT32U ap_state_resource_string_load(INT16U language, INT16U index);
 INT32S ap_state_resource_number_font_cache_init(void);
 INT32S ap_state_resource_char_resolution_get(INT16U target_char, STRING_INFO *str_info, t_STRING_TABLE_STRUCT *str_res);
 INT32S ap_state_resource_char_draw(INT16U target_char, INT16U *frame_buff, STRING_INFO *str_info);
-INT16S ap_state_resource_time_stamp_position_x_get(void);
-void ap_state_resource_time_stamp_position_y_set(INT16S y);
-
-void ap_state_resource_time_stamp_position_x_set(INT16S x);
-INT16S time_stamp_position_x, time_stamp_position_y;
 
 INT32S ap_state_resource_init(void)
 {
@@ -52,9 +47,6 @@ INT32S ap_state_resource_init(void)
 		number_font_cache = 0;
 	}
 
-	
-	ap_state_resource_time_stamp_position_x_set(65);
-	ap_state_resource_time_stamp_position_y_set(434);
 	return STATUS_OK;
 }
 
@@ -73,24 +65,7 @@ void ap_state_resource_exit(void)
 	}
 }
 
-void ap_state_resource_time_stamp_position_x_set(INT16S x)
-{
-	time_stamp_position_x = x; 
-}
 
-INT16S ap_state_resource_time_stamp_position_x_get(void)
-{
-	return time_stamp_position_x;
-}
-void ap_state_resource_time_stamp_position_y_set(INT16S y)
-{
-	time_stamp_position_y = y; 
-}
-
-INT16S ap_state_resource_time_stamp_position_y_get(void)
-{
-	return time_stamp_position_y;
-}
 
 INT32U ap_state_resource_string_load(INT16U language, INT16U index)
 {

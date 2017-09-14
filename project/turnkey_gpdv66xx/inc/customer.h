@@ -165,7 +165,6 @@
 
 #define LED1							IO_F5//blue
 #define LED2							IO_F7//red
-//#define GPVC_1247_OSD
 
 #define CAPTURE_KEY_SAVE_VIDEO			1
 #define PRODUCT_NUM                     2256

@@ -88,24 +88,23 @@ void uart_send_data(CHAR data)
 	uart_send_string(send_buf, 11);
 }
 
-CHAR* uart_recive_data(void)
+INT8U* uart_recive_data(INT8U* buf)
 {
-	CHAR* s;
+	INT8U* s = buf;
     INT8U temp;
 
     while (1)
     {
         GET_DATA(&temp);
         //SEND_DATA(temp);
-        if (temp == '\r')
+        if ((temp == '\r')||(temp == ' '))
         {
-            *s = 0;
-            return;
+            //*s = 0;
+            return s;
         }
         *s++ = (CHAR) temp;
-		return s;
+		//return s;
     }
-	//return NULL;
 }
 
 #else

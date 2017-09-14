@@ -1624,11 +1624,8 @@ typedef struct
     INT32U addr;
 } STR_ICON;
 
-#ifdef GPVC_1247_OSD
-extern void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT8U draw_type, INT8U state);
-#else
 extern void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolution);
-#endif
+
 typedef struct {
 	INT16U icon_w;
 	INT16U icon_h;
