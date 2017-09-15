@@ -322,6 +322,7 @@ void uart0_data_send(INT8U data, INT8U wait)
 INT32S uart0_data_get(INT8U *data, INT8U wait)
 {
     while (uart0_sw_fifo_get(data)) {
+		//wait--;
     	if (!wait) {						// Queue is empty and the caller doesn't want to wait
     		return STATUS_FAIL;
     	}

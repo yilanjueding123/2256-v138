@@ -85,16 +85,19 @@ void uart_send_data(CHAR data)
 	uart_send_string(send_buf, 10);
 }
 
-INT8S* uart_recive_data(INT8S* buf, INT32U len)
+INT8U uart_recive_data(INT8U* buf, INT32U len)
 {
     INT8U temp;
 	INT32U i;
+	INT8U ret = 0;
 	
-	gp_memset(buf,0,len);
+	//gp_memset(buf,0,len);
 	
-	//for(i = 0; i<len; i++)
+	for(i=0; i<len; i++)
 	{
-		GET_DATA((INT8U*)buf);
+		GET_DATA(&temp);
+		buf[i] = temp;
+		//ret = (INT8U)gp_strlen((INT8S*)buf);
 
 //		if(gp_strlen(buf) != 10)
 //		{
@@ -104,7 +107,7 @@ INT8S* uart_recive_data(INT8S* buf, INT32U len)
         //uart_send_data((CHAR)temp);
 	}
 	
-	return buf;
+	return ret;
 }
 
 #else

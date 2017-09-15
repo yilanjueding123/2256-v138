@@ -6,7 +6,7 @@
 
 #if GPLIB_PRINT_STRING_EN == 1
 extern void print_string(CHAR *fmt, ...);
-extern INT8S* uart_recive_data(INT8S* buf, INT32U len);
+extern INT8U uart_recive_data(INT8U* buf, INT32U len);
 #endif
 extern void get_string(CHAR *s);
 

@@ -5,7 +5,7 @@ MSG_Q_ID		PeripheralTaskQ;
 void *			peripheral_task_q_stack[PERIPHERAL_TASK_QUEUE_MAX];
 static INT8U	peripheral_para[PERIPHERAL_TASK_QUEUE_MAX_MSG_LEN];
 extern INT8U usb_state_get(void);
-extern INT8S* uart_recive_data(INT8S* buf, INT32U len);
+extern INT8U uart_recive_data(INT8U* buf, INT32U len);
 
 INT8U usb_charge_cnt = 0;
 
@@ -23,13 +23,13 @@ void task_peripheral_handling_init(void)
 
 
 //////////////////////////////////////////////////////////////////////////
-INT32S uart_recive_data_set_calendar(INT8S *buf)
+INT32S uart_recive_data_set_calendar(INT8U *buf)
 {
 	INT16U wtemp;
 	INT32S nRet, i;
 	INT8U  data;
 	TIME_T	time_set, time_get;
-	INT8S *pbuf = buf;
+	INT8S *pbuf = (INT8S*)buf;
 	
 	if(!buf)
 	{
@@ -171,7 +171,7 @@ INT8U			card_space_less_flag = 0;
 void task_peripheral_handling_entry(void * para)
 {
 	INT32U			msg_id;
-	INT8S 			recive_buf[10];
+	INT8U			recive_buf[32];
 	INT32U			type;
 	INT8U			usbd_debounce_cnt;
 	INT8U usb_detect_start;
@@ -260,10 +260,15 @@ void task_peripheral_handling_entry(void * para)
 					//uart_send_data(send_cnt--);
 					send_cnt = 0;
 					
-
-					if(uart_recive_data(recive_buf, 10))
+					
+					if(uart_recive_data(recive_buf, 32) == 0)
 					{
-						uart_recive_data_set_calendar(recive_buf);
+						INT32S i = 0;
+						for(i = 0; i<32; i++)
+						{
+							__msg("recive_buf[%d] = 0x%x\n", i, recive_buf[i]);
+						}
+						//uart_recive_data_set_calendar(recive_buf);
 					}
 				}
 				

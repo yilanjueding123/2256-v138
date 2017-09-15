@@ -153,6 +153,7 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 	 	for(i=0; i<DISP_OSD_FIFO_LINE; i++)
 		{
 			tmp = *chptr++;
+/*
 			if (tmp&0x80) *ptr = color_value; ptr++;
 			if (tmp&0x40) *ptr = color_value; ptr++;
 			if (tmp&0x20) *ptr = color_value; ptr++;
@@ -161,6 +162,16 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 			if (tmp&0x04) *ptr = color_value; ptr++;
 			if (tmp&0x02) *ptr = color_value; ptr++;
 			if (tmp&0x01) *ptr = color_value; ptr++;
+*/
+			if (tmp&0x01) *ptr = color_value; ptr++;
+			if (tmp&0x02) *ptr = color_value; ptr++;
+			if (tmp&0x04) *ptr = color_value; ptr++;
+			if (tmp&0x08) *ptr = color_value; ptr++;
+			if (tmp&0x10) *ptr = color_value; ptr++;
+			if (tmp&0x20) *ptr = color_value; ptr++;
+			if (tmp&0x40) *ptr = color_value; ptr++;
+			if (tmp&0x80) *ptr = color_value; ptr++;
+
 			ptr += ((1280 - 16)*2)/4;
 	 	}
 	}
@@ -174,6 +185,7 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 	 	for(i=0; i<(DISP_CHAR_HIGH - DISP_OSD_FIFO_LINE); i++)
 		{
 			tmp = *chptr++;
+/*
 			if (tmp&0x80) *ptr = color_value; ptr++;
 			if (tmp&0x40) *ptr = color_value; ptr++;
 			if (tmp&0x20) *ptr = color_value; ptr++;
@@ -182,6 +194,15 @@ void cpu_draw_osd(const INT8U *source_addr, INT32U target_addr, INT16U offset, I
 			if (tmp&0x04) *ptr = color_value; ptr++;
 			if (tmp&0x02) *ptr = color_value; ptr++;
 			if (tmp&0x01) *ptr = color_value; ptr++;
+*/
+			if (tmp&0x01) *ptr = color_value; ptr++;
+			if (tmp&0x02) *ptr = color_value; ptr++;
+			if (tmp&0x04) *ptr = color_value; ptr++;
+			if (tmp&0x08) *ptr = color_value; ptr++;
+			if (tmp&0x10) *ptr = color_value; ptr++;
+			if (tmp&0x20) *ptr = color_value; ptr++;
+			if (tmp&0x40) *ptr = color_value; ptr++;
+			if (tmp&0x80) *ptr = color_value; ptr++;
 			ptr += ((1280 - 16)*2)/4;
 	 	}
 	}
@@ -262,7 +283,7 @@ void cpu_draw_time_osd(TIME_T current_time, INT32U target_buffer, INT16U resolut
 		line = target_buffer; // + (DISP_CHAR_HIGH - DISP_OSD_FIFO_LINE) * resolution*2;
 	}
 	
-	offset = 500*2; //1000*2;
+	offset = 900*2; //1000*2;
 
 
 	space = 18*2; //

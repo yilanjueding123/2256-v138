@@ -1,39 +1,5 @@
----- PIC_WIDTH Matches (38 in 8 files) ----
-Ap_startup.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_state_handling\state_startup\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):	INT32U scale_output_buf;	//size2 = PIC_WIDTH * (32*4) * 2
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):	encode_buf = scale_output_buf + PIC_WIDTH * 32 * 2;  // + 2560*32*2
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):		//	nRet = scale_up_and_encode_fifo(scale_input_buf, input_width, input_height, scale_output_buf, PIC_WIDTH, pic_height, encode_buf, restart_index);
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			nRet = scale_up_and_encode_fifo(scale_input_buf, input_width, input_height, scale_output_buf, PIC_WIDTH, 32, encode_buf, restart_index);
-Avi_encoder_app.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_app.h (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\inc):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):						#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):						#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):						#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):					   #if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_scaler_jpeg.h (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\inc):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):	#if !((PIC_WIDTH == 2560) && (PIC_HEIGH == 1440))
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			jpeg_picture_header[9] = (PIC_WIDTH >> 8) & 0xFF;
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			jpeg_picture_header[10] = PIC_WIDTH & 0xFF;
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			jpeg_picture_header[0xB0] = (INT8U)((((PIC_WIDTH + 15) & 0xFFF0)>>2)>>8);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			jpeg_picture_header[0xB1] = (INT8U)((((PIC_WIDTH + 15) & 0xFFF0)>>2) & 0xFF);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				#if !((PIC_WIDTH == 2560) && (PIC_HEIGH == 1440))
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				#if SENSOR_WIDTH==PIC_WIDTH && SENSOR_HEIGHT==PIC_HEIGH
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):					#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):    				jpeg_picture_header[0xB0] = (INT8U)((((PIC_WIDTH + 15) & 0xFFF0)>>2)>>8);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):					jpeg_picture_header[0xB1] = (INT8U)((((PIC_WIDTH + 15) & 0xFFF0)>>2) & 0xFF);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):			  #if SENSOR_WIDTH==PIC_WIDTH && SENSOR_HEIGHT==PIC_HEIGH
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):                encode_size=jpeg_encode_once(PIC_Q_VALUE, C_JPEG_FORMAT_YUYV, PIC_WIDTH, PIC_HEIGH, pAviEncVidPara->csi_frame_addr[0], 0, 0, write_buff_addr);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				scale_up_and_encode(pAviEncVidPara->csi_frame_addr[0], write_buff_addr, PIC_WIDTH, PIC_HEIGH, pAviEncVidPara->video_encode_addr[0] + 624);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):              #if SENSOR_WIDTH==PIC_WIDTH && SENSOR_HEIGHT==PIC_HEIGH
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				//encode_size=jpeg_encode_once(PIC_Q_VALUE, C_JPEG_FORMAT_YUYV, PIC_WIDTH, PIC_HEIGH,write_buff_addr, 0, 0, pAviEncVidPara->video_encode_addr[0] + 624);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				scale_up_and_encode(write_buff_addr, write_buff_addr + 720*SENSOR_HEIGHT*2, PIC_WIDTH, PIC_HEIGH, pAviEncVidPara->video_encode_addr[0] + 624);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				//scale_up_and_encode(write_buff_addr, write_buff_addr + SENSOR_WIDTH*SENSOR_HEIGHT*2, PIC_WIDTH, PIC_HEIGH, pAviEncVidPara->video_encode_addr[0].buffer_addrs + 624);
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				//scale_up_and_encode(write_buff_addr, write_buff_addr + SENSOR_WIDTH*SENSOR_HEIGHT*2, PIC_WIDTH, PIC_HEIGH, write_buff_addr + SENSOR_WIDTH*SENSOR_HEIGHT*2 + PIC_WIDTH*16*2*2 + 624); //A/B buffer
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-Avi_encoder_state.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_avi_encoder\src):				scale_up_and_encode(write_buff_addr, write_buff_addr + SENSOR_WIDTH*SENSOR_HEIGHT*2, PIC_WIDTH, PIC_HEIGH, write_buff_addr + SENSOR_WIDTH*SENSOR_HEIGHT*2 + PIC_WIDTH*16*2*2 + 624); //A/B buffer
-Customer.h (f:\pri_f25\zhibo\2256\v138\programe\project\turnkey_gpdv66xx\inc):#define PIC_WIDTH						2560
-State_video_preview.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_state_handling\state_video_preview\src):#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
-State_video_preview.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_state_handling\state_video_preview\src):				#if (PIC_WIDTH == 2560) && (PIC_HEIGH == 1440)
+---- uart_recive_data Matches (4 in 3 files) ----
+Gplib_print_string.c (f:\pri_f25\zhibo\2256\v138\programe\gplib\print_string\src):INT8U uart_recive_data(INT8U* buf, INT32U len)
+Gplib_print_string.h (f:\pri_f25\zhibo\2256\v138\programe\gplib\print_string\inc):extern INT8U uart_recive_data(INT8S* buf, INT32U len);
+Task_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):extern INT8U uart_recive_data(INT8S* buf, INT32U len);
+Task_peripheral_handling.c (f:\pri_f25\zhibo\2256\v138\programe\application\task_peripheral_handling\src):					if(uart_recive_data(recive_buf, 10))
